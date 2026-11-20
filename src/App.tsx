@@ -1,3 +1,5 @@
+import experience from './assets/memories/experience.m4a'
+import { useBackgroundMusic } from './useBackgroundMusic'
 import SiteCompanion from './SiteCompanion'
 import Memories from './Memories'
 import { useEffect, useState } from 'react'
@@ -44,14 +46,19 @@ function App() {
     }
   }, [hash, unlocked])
 
-  if (unlocked && hash === memoriesHash) return <Memories />
+  const inMemories = unlocked && hash === memoriesHash
+  const background = useBackgroundMusic(inMemories)
 
-  return <><Entry onUnlock={() => {
+  return <>
+    <audio ref={background.audio} src={experience} preload="none" loop hidden />
+    {inMemories ? <Memories onMusicStage={background.fadeOut} onFavoritePlay={background.stop} /> : <><Entry onUnlock={() => {
+    background.start()
     try { sessionStorage.setItem(progressKey, 'yes') } catch { /* In-memory progress still works. */ }
     setUnlocked(true)
     window.location.hash = memoriesHash
     setHash(memoriesHash)
-  }} /><SiteCompanion compact /></>
+  }} /><SiteCompanion compact /></>}
+  </>
 }
 
 function Entry({ onUnlock }: { onUnlock: () => void }) {
