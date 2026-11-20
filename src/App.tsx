@@ -1,36 +1,12 @@
 import { useCallback, useEffect, useState } from 'react'
+import catImage from './assets/goli-cat.png'
 
 const keys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'clear', '0', 'back']
 
 function PixelCat() {
   return (
-    <div className="cat-stage" aria-label="گربه پیکسلی در حال استراحت" role="img">
-      <span className="cat-spark spark-one">✦</span>
-      <span className="cat-spark spark-two">·</span>
-      <svg className="pixel-cat" viewBox="0 0 160 132" shapeRendering="crispEdges" aria-hidden="true">
-        <ellipse cx="82" cy="119" rx="49" ry="6" fill="#e9d9d6" opacity=".7" />
-        <g>
-          <path d="M35 39V15H59V27H101V15H125V39H137V85H125V103H35V85H23V39Z" fill="#493b55" />
-          <path d="M41 39V23H53V35H65V29H95V35H107V23H119V39H131V81H119V97H41V81H29V39Z" fill="#f4c7a9" />
-          <path d="M47 39V29H53V41H65V35H95V41H107V29H113V39H125V57H113V51H101V57H89V51H77V57H65V51H53V57H41V39Z" fill="#f7d6bd" />
-          <path d="M41 63H53V69H41ZM107 63H119V69H107Z" fill="#493b55" />
-          <path d="M53 69H65V75H53ZM95 69H107V75H95Z" fill="#493b55" />
-          <path d="M77 75H89V81H77Z" fill="#d98d91" />
-          <path d="M71 81H77V87H71ZM89 81H95V87H89Z" fill="#493b55" />
-          <path d="M47 87H59V93H47ZM101 87H113V93H101Z" fill="#e99e9d" opacity=".85" />
-          <path d="M29 45H41V57H29ZM119 45H131V57H119Z" fill="#f7d6bd" />
-          <path d="M59 99H101V111H59Z" fill="#f4c7a9" />
-          <path d="M47 105H59V111H47ZM101 105H113V111H101Z" fill="#493b55" />
-          <path d="M53 111H71V117H53ZM89 111H107V117H89Z" fill="#493b55" />
-          <path d="M65 99H95V105H65Z" fill="#fff0e4" />
-          <path d="M23 75H35V93H23ZM131 75H143V93H131Z" fill="#493b55" />
-          <path d="M17 87H29V99H17ZM137 87H149V99H137Z" fill="#493b55" />
-          <path d="M23 93H35V105H23ZM131 93H143V105H131Z" fill="#f4c7a9" />
-        </g>
-        <path d="M80 91H86V97H80Z" fill="#f08eaa" />
-        <path d="M65 45H71V51H65ZM89 45H95V51H89Z" fill="#fff8f2" opacity=".8" />
-      </svg>
-      <span className="cat-heart">♥</span>
+    <div className="cat-stage">
+      <img className="cat-image" src={catImage} alt="گربه‌ی پیکسلی در حال استراحت" />
     </div>
   )
 }
