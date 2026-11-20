@@ -19,6 +19,8 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    outputs:
+      deploy_ready: ${{ steps.config.outputs.deploy_ready }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -31,19 +33,31 @@ jobs:
       - name: Install dependencies
         run: npm install --no-audit --no-fund
 
+      - name: Check deployment configuration
+        id: config
+        env:
+          VITE_BIRTH_YEAR: ${{ secrets.VITE_BIRTH_YEAR }}
+        run: |
+          if [ -n "$VITE_BIRTH_YEAR" ]; then
+            echo "deploy_ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "deploy_ready=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::Set the repository Actions secret VITE_BIRTH_YEAR to enable the Pages deployment."
+          fi
+
       - name: Build
         env:
           VITE_BIRTH_YEAR: ${{ secrets.VITE_BIRTH_YEAR }}
         run: npm run build
 
       - name: Upload Pages artifact
-        if: github.event_name != 'pull_request'
+        if: github.event_name != 'pull_request' && steps.config.outputs.deploy_ready == 'true'
         uses: actions/upload-pages-artifact@v3
         with:
           path: dist
 
   deploy:
-    if: github.event_name != 'pull_request'
+    if: github.event_name != 'pull_request' && needs.build.outputs.deploy_ready == 'true'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
