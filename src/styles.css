@@ -757,3 +757,6 @@ h1 { letter-spacing: normal; }
   unicode-range: U+0000-00FF, U+2000-206F;
 }
 .memories-page .background-music-retry { margin: 8px; }
+.background-music-control { margin-block-start: 10px; }
+.background-music-control > p { margin: 3px 8px 0; color: var(--readable-muted); font-size: .85rem; }
+.background-music-control > p:empty { display: none; }

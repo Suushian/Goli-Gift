@@ -1,3 +1,4 @@
+import type { BackgroundMusicStatus } from './useBackgroundMusic'
 import { usePixelSound } from './usePixelSound'
 import roseCover from './assets/memories/savage-rose-cover.webp'
 import SiteCompanion from './SiteCompanion'
@@ -95,11 +96,11 @@ function StageProgress({ active }: { active: number }) {
   )
 }
 
-export default function Memories({ onMusicStage, onFavoritePlay, showBackgroundPlay, onBackgroundPlay }: {
+export default function Memories({ onMusicStage, onFavoritePlay, backgroundStatus, onBackgroundToggle }: {
   onMusicStage: () => void
   onFavoritePlay: () => void
-  showBackgroundPlay: boolean
-  onBackgroundPlay: () => void
+  backgroundStatus: BackgroundMusicStatus
+  onBackgroundToggle: () => void
 }) {
   const sound = usePixelSound()
   const soundControl = <button className="effects-toggle" type="button" data-silent aria-label="جلوه‌های صوتی" aria-pressed={sound.enabled} onClick={sound.toggle}>
@@ -213,7 +214,14 @@ export default function Memories({ onMusicStage, onFavoritePlay, showBackgroundP
             <h1 ref={heading} tabIndex={-1}>از کوچولویی تا امروز</h1>
             <p>از اون نگاه جدیِ کوچولویی تا توی امروز؛ این چند قاب رو برای تو کنار هم گذاشتم.</p>
             <button className="memory-cta" type="button" data-sound="page" onClick={openAlbum}>دیدن عکس‌ها ✦</button>
-            {showBackgroundPlay && <button className="background-music-retry" type="button" data-silent onClick={onBackgroundPlay}>♫ پخش موسیقی پس‌زمینه</button>}
+            {backgroundStatus !== 'stopped' && <div className="background-music-control">
+              <button className="background-music-retry" type="button" data-silent onClick={onBackgroundToggle}>
+                {backgroundStatus === 'playing' ? 'Ⅱ مکث موسیقی پس‌زمینه' : '♫ پخش موسیقی پس‌زمینه'}
+              </button>
+              <p role="status" aria-live="polite">
+                {backgroundStatus === 'loading' ? 'دارم موسیقی رو آماده می‌کنم…' : backgroundStatus === 'retry' ? 'پخش شروع نشد؛ یک بار روی دکمه بزن.' : ''}
+              </p>
+            </div>}
           </div>
           <figure className="memory-character">
             <div className="character-glow" aria-hidden="true" />
