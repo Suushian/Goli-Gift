@@ -71,11 +71,6 @@ function App() {
 
   return (
     <main className="page-shell" dir="rtl">
-      <div className="ambient ambient-left" />
-      <div className="ambient ambient-right" />
-      <div className="tiny-star star-a">✳</div>
-      <div className="tiny-star star-b">✦</div>
-      <div className="tiny-star star-c">✧</div>
 
       <section className="login-card" aria-labelledby="welcome-title">
         <div className="card-top-line" />
