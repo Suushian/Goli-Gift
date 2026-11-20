@@ -22,7 +22,8 @@ For GitHub Pages, add a repository Actions variable named `BIRTH_YEAR` with the 
 1. Open **Settings → Secrets and variables → Actions → Variables**.
 2. Select **New repository variable**.
 3. Name: `BIRTH_YEAR`; Value: the four-digit birthday year.
-4. Save, then open **Actions** and run **Deploy to GitHub Pages** (or push to `main`).
+4. Save. In **Settings → Pages → Build and deployment**, set **Source** to **GitHub Actions**.
+5. Open **Actions** and run **Deploy to GitHub Pages** (or push to `main`).
 
 The year is compiled into the public client-side app so this is only a playful gate, not secure authentication. Do not use it to protect private content.
 
