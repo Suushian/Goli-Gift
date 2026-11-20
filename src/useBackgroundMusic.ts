@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 const fadeMs = 2000
 const startupTimeoutMs = 4000
 
-type Status = 'idle' | 'loading' | 'playing' | 'retry' | 'stopped'
+export type BackgroundMusicStatus = 'idle' | 'loading' | 'playing' | 'retry' | 'stopped'
 
 export function useBackgroundMusic(active: boolean) {
   const audio = useRef<HTMLAudioElement>(null)
@@ -12,7 +12,7 @@ export function useBackgroundMusic(active: boolean) {
   const startupTimer = useRef<number | undefined>(undefined)
   const attempt = useRef(0)
   const warmed = useRef(false)
-  const [status, setStatus] = useState<Status>('idle')
+  const [status, setStatus] = useState<BackgroundMusicStatus>('idle')
 
   function clearTimers() {
     cancelAnimationFrame(frame.current)
@@ -92,5 +92,14 @@ export function useBackgroundMusic(active: boolean) {
     fadeTimer.current = window.setTimeout(stop, fadeMs)
   }
 
-  return { audio, status, warm, start, fadeOut, stop }
+  function toggle() {
+    if (status === 'playing') {
+      stop()
+      setStatus('idle')
+    } else {
+      start()
+    }
+  }
+
+  return { audio, status, warm, start, fadeOut, stop, toggle }
 }

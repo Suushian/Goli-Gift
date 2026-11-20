@@ -1,4 +1,4 @@
-import experience from './assets/memories/experience.m4a'
+import experience from './assets/memories/experience.mp3'
 import { useBackgroundMusic } from './useBackgroundMusic'
 import SiteCompanion from './SiteCompanion'
 import { lazy, Suspense, useEffect, useState } from 'react'
@@ -56,8 +56,7 @@ function App() {
     {inMemories ? (
       <Suspense fallback={<main className="page-shell"><p className="page-note" role="status">دارم دفتر خاطرات رو باز می‌کنم…</p></main>}>
         <Memories onMusicStage={background.fadeOut} onFavoritePlay={background.stop}
-          showBackgroundPlay={background.status === 'idle' || background.status === 'retry'}
-          onBackgroundPlay={background.start} />
+          backgroundStatus={background.status} onBackgroundToggle={background.toggle} />
       </Suspense>
     ) : <>
       <Entry onIntent={background.warm} onUnlock={() => {
