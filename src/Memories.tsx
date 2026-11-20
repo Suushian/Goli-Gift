@@ -1,5 +1,4 @@
 import { usePixelSound } from './usePixelSound'
-import BirthdayGame from './BirthdayGame'
 import roseCover from './assets/memories/savage-rose-cover.webp'
 import SiteCompanion from './SiteCompanion'
 import solarDamage from './assets/memories/solar-damage.webp'
@@ -7,13 +6,15 @@ import solarRepair from './assets/memories/solar-repair.webp'
 import gardenCat from './assets/goli-cat.png'
 import hug from './assets/memories/hug.webp'
 import companion from './assets/memories/companion.webp'
-import { useEffect, useRef, useState, type PointerEvent } from 'react'
+import { lazy, Suspense, useEffect, useRef, useState, type PointerEvent } from 'react'
 import character from './assets/memories/character.webp'
 import first from './assets/memories/photo-1.webp'
 import beach from './assets/memories/photo-2.webp'
 import together from './assets/memories/photo-3.webp'
 import orange from './assets/memories/photo-4.webp'
 import today from './assets/memories/photo-5.webp'
+
+const BirthdayGame = lazy(() => import('./BirthdayGame'))
 
 const trackUrl = 'https://soundcloud.com/koorowsh420/01-savage-rose'
 const localTrack = import.meta.glob('./assets/memories/savage-rose.m4a', { eager: true, query: '?url', import: 'default' })['./assets/memories/savage-rose.m4a'] as string | undefined
@@ -94,7 +95,12 @@ function StageProgress({ active }: { active: number }) {
   )
 }
 
-export default function Memories({ onMusicStage, onFavoritePlay }: { onMusicStage: () => void; onFavoritePlay: () => void }) {
+export default function Memories({ onMusicStage, onFavoritePlay, showBackgroundPlay, onBackgroundPlay }: {
+  onMusicStage: () => void
+  onFavoritePlay: () => void
+  showBackgroundPlay: boolean
+  onBackgroundPlay: () => void
+}) {
   const sound = usePixelSound()
   const soundControl = <button className="effects-toggle" type="button" data-silent aria-label="جلوه‌های صوتی" aria-pressed={sound.enabled} onClick={sound.toggle}>
     <span aria-hidden="true">{sound.enabled ? '♫' : '♪'}</span> افکت صدا: {sound.enabled ? 'روشن' : 'خاموش'}
@@ -207,6 +213,7 @@ export default function Memories({ onMusicStage, onFavoritePlay }: { onMusicStag
             <h1 ref={heading} tabIndex={-1}>از کوچولویی تا امروز</h1>
             <p>از اون نگاه جدیِ کوچولویی تا توی امروز؛ این چند قاب رو برای تو کنار هم گذاشتم.</p>
             <button className="memory-cta" type="button" data-sound="page" onClick={openAlbum}>دیدن عکس‌ها ✦</button>
+            {showBackgroundPlay && <button className="background-music-retry" type="button" data-silent onClick={onBackgroundPlay}>♫ پخش موسیقی پس‌زمینه</button>}
           </div>
           <figure className="memory-character">
             <div className="character-glow" aria-hidden="true" />
@@ -355,7 +362,9 @@ export default function Memories({ onMusicStage, onFavoritePlay }: { onMusicStag
           <button className="memory-cta" type="button" data-sound="page" onClick={() => { setGameVisited(true); setChapter('game') }}>{gameVisited ? 'ادامهٔ بازی' : 'بریم سراغ بازی'} ←</button>
         </div>
       </section>}
-      {gameVisited && <BirthdayGame soundControl={soundControl} active={chapter === 'game'} onBack={() => setChapter('event')} />}
+      {gameVisited && <Suspense fallback={<section className="birthday-game" role="status">دارم بازی رو آماده می‌کنم…</section>}>
+        <BirthdayGame soundControl={soundControl} active={chapter === 'game'} onBack={() => setChapter('event')} />
+      </Suspense>}
     </main>
   )
 }

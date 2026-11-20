@@ -741,3 +741,19 @@ h1 { letter-spacing: normal; }
 .memory-event-story h2 { color: #fff8fc; }
 .memory-event-story .memories-kicker, .memory-event-story > a { color: #ffdeef; }
 .memory-event-story .event-beats { color: var(--readable-ink); }
+
+@font-face {
+  font-family: 'Vazirmatn';
+  src: url('./assets/fonts/vazirmatn-arabic.woff2') format('woff2');
+  font-weight: 100 900;
+  font-display: swap;
+  unicode-range: U+0600-06FF, U+0750-077F, U+0870-08FF, U+200C-200F, U+FB50-FDFF, U+FE70-FEFF;
+}
+@font-face {
+  font-family: 'Vazirmatn';
+  src: url('./assets/fonts/vazirmatn-latin.woff2') format('woff2');
+  font-weight: 100 900;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+2000-206F;
+}
+.memories-page .background-music-retry { margin: 8px; }

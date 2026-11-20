@@ -1,80 +1,96 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
-const level = 0.24
-const fadeSeconds = 2
+const fadeMs = 2000
+const startupTimeoutMs = 4000
+
+type Status = 'idle' | 'loading' | 'playing' | 'retry' | 'stopped'
 
 export function useBackgroundMusic(active: boolean) {
   const audio = useRef<HTMLAudioElement>(null)
-  const graph = useRef<{ context: AudioContext; gain: GainNode } | null>(null)
   const frame = useRef(0)
-  const timer = useRef<number | undefined>(undefined)
+  const fadeTimer = useRef<number | undefined>(undefined)
+  const startupTimer = useRef<number | undefined>(undefined)
+  const attempt = useRef(0)
+  const warmed = useRef(false)
+  const [status, setStatus] = useState<Status>('idle')
 
-  function cancelFade() {
+  function clearTimers() {
     cancelAnimationFrame(frame.current)
-    window.clearTimeout(timer.current)
-    const output = graph.current
-    if (output) output.gain.gain.cancelScheduledValues(output.context.currentTime)
+    window.clearTimeout(fadeTimer.current)
+    window.clearTimeout(startupTimer.current)
   }
 
   function stop() {
-    cancelFade()
+    attempt.current++
+    clearTimers()
     audio.current?.pause()
+    setStatus('stopped')
   }
 
   useEffect(() => {
-    if (!active) stop()
+    if (!active) {
+      attempt.current++
+      clearTimers()
+      audio.current?.pause()
+      setStatus('idle')
+    }
   }, [active])
 
   useEffect(() => () => {
-    stop()
-    void graph.current?.context.close().catch(() => {})
-    graph.current = null
+    attempt.current++
+    clearTimers()
   }, [])
+
+  function warm() {
+    if (warmed.current || !audio.current) return
+    // This is a hint, not load(): calling load() would abort an existing request.
+    audio.current.preload = 'auto'
+    warmed.current = true
+  }
 
   function start() {
     const track = audio.current
     if (!track) return
-    cancelFade()
-    if (!graph.current && window.AudioContext) {
-      try {
-        const context = new AudioContext()
-        const gain = context.createGain()
-        context.createMediaElementSource(track).connect(gain).connect(context.destination)
-        graph.current = { context, gain }
-      } catch { /* Fall back to the audio element's volume. */ }
-    }
-    const output = graph.current
-    track.currentTime = 0
-    track.volume = output ? 1 : level
-    if (output) {
-      output.gain.gain.setValueAtTime(level, output.context.currentTime)
-      void output.context.resume().catch(() => {})
-    }
-    void track.play().catch(() => {})
+    clearTimers()
+    const currentAttempt = ++attempt.current
+    track.volume = 1 // The asset itself is mastered at background volume.
+    if (track.error) track.load()
+    setStatus('loading')
+    startupTimer.current = window.setTimeout(() => {
+      if (attempt.current === currentAttempt) setStatus('retry')
+    }, startupTimeoutMs)
+    // Call play directly inside the unlock gesture, without awaiting a decode or AudioContext.
+    void track.play().then(() => {
+      if (attempt.current !== currentAttempt) return
+      window.clearTimeout(startupTimer.current)
+      setStatus('playing')
+    }, () => {
+      if (attempt.current !== currentAttempt) return
+      window.clearTimeout(startupTimer.current)
+      setStatus('retry')
+    })
   }
 
   function fadeOut() {
     const track = audio.current
-    if (!track || track.paused) return
-    cancelFade()
-    const output = graph.current
-    if (output) {
-      const now = output.context.currentTime
-      output.gain.gain.setValueAtTime(output.gain.gain.value, now)
-      output.gain.gain.linearRampToValueAtTime(0, now + fadeSeconds)
-      timer.current = window.setTimeout(stop, fadeSeconds * 1000)
-    } else {
-      const startTime = performance.now()
-      const startVolume = track.volume
-      function fade(now: number) {
-        const remaining = Math.max(0, 1 - (now - startTime) / (fadeSeconds * 1000))
-        track!.volume = startVolume * remaining
-        if (remaining > 0) frame.current = requestAnimationFrame(fade)
-        else stop()
-      }
-      frame.current = requestAnimationFrame(fade)
+    // Cancel a pending start too, so delayed playback can't bleed into Savage Rose.
+    if (!track || track.paused || track.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) {
+      stop()
+      return
     }
+    attempt.current++
+    clearTimers()
+    setStatus('stopped')
+    const startedAt = performance.now()
+    const startVolume = track.volume
+    function fade(now: number) {
+      if (!track) return
+      track.volume = startVolume * Math.max(0, 1 - (now - startedAt) / fadeMs)
+      if (now - startedAt < fadeMs) frame.current = requestAnimationFrame(fade)
+    }
+    frame.current = requestAnimationFrame(fade)
+    fadeTimer.current = window.setTimeout(stop, fadeMs)
   }
 
-  return { audio, start, fadeOut, stop }
+  return { audio, status, warm, start, fadeOut, stop }
 }
