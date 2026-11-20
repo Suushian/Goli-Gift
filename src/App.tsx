@@ -1,9 +1,11 @@
 import experience from './assets/memories/experience.m4a'
 import { useBackgroundMusic } from './useBackgroundMusic'
 import SiteCompanion from './SiteCompanion'
-import Memories from './Memories'
-import { useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import catImage from './assets/goli-cat.png'
+
+const loadMemories = () => import('./Memories')
+const Memories = lazy(loadMemories)
 
 const keys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'clear', '0', 'back']
 
@@ -50,18 +52,27 @@ function App() {
   const background = useBackgroundMusic(inMemories)
 
   return <>
-    <audio ref={background.audio} src={experience} preload="none" loop hidden />
-    {inMemories ? <Memories onMusicStage={background.fadeOut} onFavoritePlay={background.stop} /> : <><Entry onUnlock={() => {
-    background.start()
-    try { sessionStorage.setItem(progressKey, 'yes') } catch { /* In-memory progress still works. */ }
-    setUnlocked(true)
-    window.location.hash = memoriesHash
-    setHash(memoriesHash)
-  }} /><SiteCompanion compact /></>}
+    <audio ref={background.audio} src={experience} preload="metadata" loop hidden />
+    {inMemories ? (
+      <Suspense fallback={<main className="page-shell"><p className="page-note" role="status">دارم دفتر خاطرات رو باز می‌کنم…</p></main>}>
+        <Memories onMusicStage={background.fadeOut} onFavoritePlay={background.stop}
+          showBackgroundPlay={background.status === 'idle' || background.status === 'retry'}
+          onBackgroundPlay={background.start} />
+      </Suspense>
+    ) : <>
+      <Entry onIntent={background.warm} onUnlock={() => {
+        background.start()
+        try { sessionStorage.setItem(progressKey, 'yes') } catch { /* In-memory progress still works. */ }
+        setUnlocked(true)
+        window.location.hash = memoriesHash
+        setHash(memoriesHash)
+      }} />
+      <SiteCompanion compact />
+    </>}
   </>
 }
 
-function Entry({ onUnlock }: { onUnlock: () => void }) {
+function Entry({ onUnlock, onIntent }: { onUnlock: () => void; onIntent: () => void }) {
   const [code, setCode] = useState('')
   const [message, setMessage] = useState('')
   const [status, setStatus] = useState<'idle' | 'error'>('idle')
@@ -106,7 +117,7 @@ function Entry({ onUnlock }: { onUnlock: () => void }) {
           <p>برای باز کردن درِ سورپرایزت، رمز رو وارد کن.</p>
         </div>
 
-        <form className="entry-form" onSubmit={(event) => {
+        <form className="entry-form" onFocus={onIntent} onPointerDown={onIntent} onSubmit={(event) => {
           event.preventDefault()
           submit()
         }}>
