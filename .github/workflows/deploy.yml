@@ -29,18 +29,7 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Validate birthday year
-        env:
-          BIRTH_YEAR: ${{ vars.BIRTH_YEAR }}
-        run: |
-          if ! [[ "$BIRTH_YEAR" =~ ^[0-9]{4}$ ]]; then
-            echo "::error::Set the repository Actions variable BIRTH_YEAR to the four-digit birthday year."
-            exit 1
-          fi
-
       - name: Build
-        env:
-          VITE_BIRTH_YEAR: ${{ vars.BIRTH_YEAR }}
         run: npm run build
 
       - name: Upload Pages artifact
