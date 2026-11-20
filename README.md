@@ -14,7 +14,7 @@ npm run dev
 For local development, create a local `.env` file (never commit it):
 
 ```env
-VITE_BIRTH_YEAR=2007
+VITE_BIRTH_YEAR=2000
 ```
 
 For GitHub Pages, add a repository Actions variable named `BIRTH_YEAR` with the four-digit year:
