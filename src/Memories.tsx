@@ -23,7 +23,7 @@ function formatTime(seconds: number) {
   return `${Math.floor(full / 60)}:${String(full % 60).padStart(2, '0')}`
 }
 
-function PixelMusicPlayer() {
+function PixelMusicPlayer({ onPlayRequest }: { onPlayRequest: () => void }) {
   const audio = useRef<HTMLAudioElement>(null)
   const [failed, setFailed] = useState(false)
   const [playing, setPlaying] = useState(false)
@@ -35,6 +35,7 @@ function PixelMusicPlayer() {
     const element = audio.current
     if (!element) return
     if (!element.paused) { element.pause(); return }
+    onPlayRequest()
     setPlayRejected(false)
     try { await element.play() } catch { setPlayRejected(true) }
   }
@@ -93,7 +94,7 @@ function StageProgress({ active }: { active: number }) {
   )
 }
 
-export default function Memories() {
+export default function Memories({ onMusicStage, onFavoritePlay }: { onMusicStage: () => void; onFavoritePlay: () => void }) {
   const sound = usePixelSound()
   const soundControl = <button className="effects-toggle" type="button" data-silent aria-label="جلوه‌های صوتی" aria-pressed={sound.enabled} onClick={sound.toggle}>
     <span aria-hidden="true">{sound.enabled ? '♫' : '♪'}</span> افکت صدا: {sound.enabled ? 'روشن' : 'خاموش'}
@@ -178,7 +179,7 @@ export default function Memories() {
   }, [albumOpen, playing, activePhoto, lastPhoto])
 
   function openAlbum() {
-    document.querySelector('audio')?.pause()
+    document.querySelector<HTMLAudioElement>('.pixel-player audio')?.pause()
     choosePhoto(0)
     setPlaying(true)
     setAlbumOpen(true)
@@ -296,6 +297,7 @@ export default function Memories() {
             <button type="button" disabled={activePhoto === 0} onClick={() => choosePhoto(activePhoto - 1)}>→ قبلی</button>
             {activePhoto < lastPhoto ? <button type="button" data-sound="page" onClick={() => choosePhoto(activePhoto + 1)}>بعدی ←</button> : <button type="button" onClick={() => {
               dialog.current?.close()
+              onMusicStage()
               setChapter('music')
             }}>ادامهٔ خاطرات ←</button>}
           </div>
@@ -311,7 +313,7 @@ export default function Memories() {
           <div className="memory-screen-body">
             <p className="memories-kicker">یک مکث برای گوش دادن</p>
             <h2 id="memory-music" tabIndex={-1}>آهنگ مورد علاقه‌ات</h2>
-            <PixelMusicPlayer />
+            <PixelMusicPlayer onPlayRequest={onFavoritePlay} />
           </div>
         </div>
         <div className="memory-stage-nav">
