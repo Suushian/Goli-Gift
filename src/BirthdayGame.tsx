@@ -8,11 +8,6 @@ const questions = [
   { prompt: 'اگه قرار باشه یه قاب تازه به آلبوممون اضافه کنیم، دوست داری کجا بگیریمش؟', hint: 'یه جای واقعی یا خیالی؛ هرچی دلت می‌خواد.', feedback: 'این یکی جواب درست و غلط نداره. شاید همین بشه قصهٔ قاب بعدی‌تون. ✦' },
 ]
 
-const voiceFiles = import.meta.glob('./assets/memories/birthday-voice.{mp3,m4a,ogg,wav}', {
-  eager: true, query: '?url', import: 'default',
-})
-const voiceUrl = Object.values(voiceFiles)[0] as string | undefined
-
 const fa = new Intl.NumberFormat('fa')
 
 export default function BirthdayGame({ active, onBack, soundControl }: { active: boolean; onBack: () => void; soundControl: ReactNode }) {
@@ -20,9 +15,6 @@ export default function BirthdayGame({ active, onBack, soundControl }: { active:
   const [draft, setDraft] = useState('')
   const [submitted, setSubmitted] = useState(false)
   const [index, setIndex] = useState(0)
-  const voice = useRef<HTMLAudioElement>(null)
-  const [needsPlay, setNeedsPlay] = useState(false)
-  const [voiceError, setVoiceError] = useState(false)
   const title = useRef<HTMLHeadingElement>(null)
   const question = questions[index]
 
@@ -82,10 +74,7 @@ export default function BirthdayGame({ active, onBack, soundControl }: { active:
           <p className="game-kicker">بازی تموم شد ✦</p>
           <h1 id="game-title" ref={title} tabIndex={-1}>این بازی برنده‌ش معلوم بود: تو ♥</h1>
           <p>مرسی که دفتر خاطرات رو تا آخر با من ورق زدی. ♥</p>
-          <button className="game-primary" type="button" data-sound={voiceUrl ? undefined : "sparkle"} data-silent={voiceUrl ? true : undefined} onClick={() => {
-            setMode('gift')
-            void voice.current?.play().catch(() => setNeedsPlay(true))
-          }}>بخاطر جوابای درستت توی بازی، وقتشه کادو تولدتو بگیری 🎁</button>
+          <button className="game-primary" type="button" data-sound="sparkle" onClick={() => setMode('gift')}>بخاطر جوابای درستت توی بازی، وقتشه کادو تولدتو بگیری 🎁</button>
         </div>}
         {mode === 'gift' && <div className="game-welcome gift-content">
           <div className="gift-stage" aria-hidden="true">
@@ -93,12 +82,13 @@ export default function BirthdayGame({ active, onBack, soundControl }: { active:
           </div>
           <p className="game-kicker">از طرف سوشیان، برای تو ♥</p>
           <h1 id="game-title" ref={title} tabIndex={-1}>تولدت مبارک!</h1>
-          {voiceUrl && !voiceError ? (
-            <p>{needsPlay ? 'برای شنیدن ویس، دکمهٔ پخش رو بزن.' : 'این ویس فقط برای توئه.'}</p>
-          ) : <p role="status">{voiceError ? 'ویس قابل پخش نیست.' : 'ویس تولد هنوز به این صفحه اضافه نشده.'}</p>}
+          <div className="gift-letter">
+            <p>سلام تولدتو مبارک 🎂</p>
+            <p>امروز یه روز معمولی نیست، روزِ توئه. می‌خواستم یه چیز حسابی برات بگیرم ولی هیچی به پای خودت نمی‌رسید؛ پس این دفتر خاطرات شد کادوت.</p>
+            <p>این‌جوری شد که هم عکس‌های خودمونو یه‌بار دیگه ببینم، هم یه آهنگ گوش بدیم، هم یه بازی بکنیم و هم آخرش این حرفا رو بهت بگم.</p>
+            <p>باشه دیگه، طولش نمی‌دم: تولدت مبارک، الهی همیشه بخندی و حالت خوب باشه. هر آرزویی داری همون بشه. سوشیان دوستت داره، یه عالمه ♥</p>
+          </div>
         </div>}
-        {voiceUrl && <audio ref={voice} src={voiceUrl} preload="none" controls={mode === 'gift'} hidden={mode !== 'gift' || voiceError}
-          aria-label="ویس تبریک تولد سوشیان" onPlay={() => setNeedsPlay(false)} onError={() => setVoiceError(true)} />}
       </div>
     </section>
   )
