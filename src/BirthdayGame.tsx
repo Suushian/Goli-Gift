@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { useBirthdayTune } from './useBirthdayTune'
 import cat from './assets/goli-cat.png'
+import tune from './assets/memories/birthday-tune.mp3'
 
 const questions = [
   { prompt: 'سوشیان چی صدات می‌کنه؟', hint: 'همون اسم خودمونی که با شنیدنش می‌فهمی کار خودشه…', feedback: 'همین اسم وقتی از زبون سوشیان میاد، یه جور دیگه‌ست. ♥' },
@@ -17,6 +19,7 @@ export default function BirthdayGame({ active, onBack, soundControl }: { active:
   const [index, setIndex] = useState(0)
   const title = useRef<HTMLHeadingElement>(null)
   const question = questions[index]
+  const music = useBirthdayTune(active && mode === 'gift')
 
   useEffect(() => {
     if (!active) return
@@ -74,7 +77,10 @@ export default function BirthdayGame({ active, onBack, soundControl }: { active:
           <p className="game-kicker">بازی تموم شد ✦</p>
           <h1 id="game-title" ref={title} tabIndex={-1}>این بازی برنده‌ش معلوم بود: تو ♥</h1>
           <p>مرسی که دفتر خاطرات رو تا آخر با من ورق زدی. ♥</p>
-          <button className="game-primary" type="button" data-sound="sparkle" onClick={() => setMode('gift')}>بخاطر جوابای درستت توی بازی، وقتشه کادو تولدتو بگیری 🎁</button>
+          <button className="game-primary" type="button" data-sound="sparkle" onClick={() => {
+            setMode('gift')
+            music.start(true)
+          }}>بخاطر جوابای درستت توی بازی، وقتشه کادو تولدتو بگیری 🎁</button>
         </div>}
         {mode === 'gift' && <div className="game-welcome gift-content">
           <div className="gift-stage" aria-hidden="true">
@@ -82,6 +88,14 @@ export default function BirthdayGame({ active, onBack, soundControl }: { active:
           </div>
           <p className="game-kicker">از طرف سوشیان، برای تو ♥</p>
           <h1 id="game-title" ref={title} tabIndex={-1}>تولدت مبارک!</h1>
+          <audio ref={music.audio} src={tune} preload="auto" loop hidden />
+          <div className="gift-tune">
+            <button type="button" data-silent onClick={music.toggle} aria-pressed={music.status === 'playing'}>
+              <span className="gift-tune-ring" aria-hidden="true">{music.status === 'playing' ? '♫' : '♪'}</span>
+              {music.status === 'playing' ? 'مکث آهنگ تولد' : 'پخش آهنگ تولد'}
+            </button>
+            {music.status === 'blocked' && <p role="status">پخش خودکار شروع نشد؛ یه بار روی دکمه بزن.</p>}
+          </div>
           <div className="gift-letter">
             <p>الان که این متنو می‌خونی یه مدت از تولدت گذشته، ببخش که یه‌کم دیر شد — و شاید مثل خیلیای دیگه کادو تولدت یه چیز گرون یا فیزیکی نیست.</p>
             <p>زیاد طولش نمی‌دم؛ یادته خیلی وقت پیش به شوخی وصیت‌نامه نوشتیم و به هم نشونش دادیم؟ اون وصیت‌نامه می‌دونست که قراره جزوی از زندگی من بشی. همو از نزدیک ندیدیم یا همو تا حالا بغل نکردیم، ولی اگه بعد از سال‌ها دوباره به هم پیام بدیم، دوباره مثل همیشه صمیمی خواهیم بود.</p>
