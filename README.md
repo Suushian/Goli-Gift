@@ -36,8 +36,14 @@ serve it from the site itself, without a SoundCloud embed. Without the M4A,
 only the external listening link is offered. Local assets do not make the
 hosted website available offline; that requires a local copy or offline caching.
 
-## Birthday message
+## Birthday message and tune
 
 The finale needs no recording: the gift button opens a page with a short,
 spoken-style birthday note. To change the wording, edit the `gift-letter` block
 in `src/BirthdayGame.tsx`.
+
+The same page plays `src/assets/memories/birthday-tune.mp3`, a short original
+music-box arrangement that starts inside the gift-button click and loops. A
+play/pause chip and a fallback message are shown in case a browser blocks
+autoplay. Replace that MP3 (or edit the generator described in the file header)
+to use a different tune.

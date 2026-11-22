@@ -651,6 +651,11 @@ body:has(.memory-slideshow[open]) { overflow: hidden; }
 .birthday-finale { padding-bottom: 26px; background: linear-gradient(#f9dcebe8, #eee0f9df), url('./assets/pixel-garden.webp') center / cover; }
 .birthday-finale .game-panel { text-align: center; }
 .gift-icon { display: block; font-size: clamp(3rem, 14vw, 6rem); line-height: 1.2; }
+.gift-tune { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 8px; margin: 12px auto 6px; }
+.memories-page .gift-tune button:not(.photo-open) { padding: 6px 14px; border-radius: 20px; background: #f6e8fa; font-size: .85rem; font-weight: 700; }
+.gift-tune p { margin: 0; color: #634864; font-size: .82rem; }
+.gift-tune-ring { display: inline-block; margin-inline-end: 4px; }
+@media (prefers-reduced-motion: no-preference) { .gift-tune-ring { animation: tiny-sparkle 2.4s ease-in-out infinite; } }
 .gift-letter { max-width: 46ch; margin: 14px auto 4px; padding: clamp(14px, 4vw, 24px); border: 1px dashed #b48cbb; border-radius: 12px; background: #fffaf4; text-align: start; }
 .gift-letter p { margin: 0 0 12px; font-size: clamp(.98rem, 2.2vw, 1.08rem); line-height: 2; }
 .gift-letter p:first-child { font-weight: 800; color: #733762; }
