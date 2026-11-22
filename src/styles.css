@@ -651,7 +651,11 @@ body:has(.memory-slideshow[open]) { overflow: hidden; }
 .birthday-finale { padding-bottom: 26px; background: linear-gradient(#f9dcebe8, #eee0f9df), url('./assets/pixel-garden.webp') center / cover; }
 .birthday-finale .game-panel { text-align: center; }
 .gift-icon { display: block; font-size: clamp(3rem, 14vw, 6rem); line-height: 1.2; }
-.birthday-finale audio { width: min(100%, 400px); }
+.gift-letter { max-width: 46ch; margin: 14px auto 4px; padding: clamp(14px, 4vw, 24px); border: 1px dashed #b48cbb; border-radius: 12px; background: #fffaf4; text-align: start; }
+.gift-letter p { margin: 0 0 12px; font-size: clamp(.98rem, 2.2vw, 1.08rem); line-height: 2; }
+.gift-letter p:first-child { font-weight: 800; color: #733762; }
+.gift-letter p:last-child { margin-bottom: 0; }
+@media (prefers-reduced-motion: no-preference) { .gift-letter { animation: scrapbook-arrive .5s var(--soft-motion) .1s both; } }
 .memories-page:has(.birthday-finale) > .memory-companion { display: none; }
 @media (prefers-reduced-motion: no-preference) { .gift-content { animation: scrapbook-arrive .45s var(--soft-motion) both; } }
 
